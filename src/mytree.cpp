@@ -20,8 +20,14 @@ public:
          printf("Cannot add to a File");
     }
     void display(int depth){
-        std::string out=std::string(depth,'-');
-        std::cout<<out<<fileName<<std::endl;
+        // std::string out=std::string(depth,'-');
+        // std::cout<<out<<fileName<<std::endl;
+        // std::string out=std::string(depth/2,' ');
+        // out+='|';
+        // out+=std::string(2,'-');
+        // std::cout<<out<<fileName<<std::endl;
+        std::string indentation(depth, ' ');
+        std::cout << indentation << "|-- " << fileName << std::endl;
     }
 };
 
@@ -34,16 +40,39 @@ public:
          children.emplace_back(fileNode);
     }
     void display(int depth){
-        std::string out=std::string(depth,'-');
-        std::cout<<out<<fileName<<std::endl;
-        for(auto it:children){
-            it->display(depth+2);
+        // std::string out=std::string(depth/2,' ');
+        // out+='|';
+        // out+=std::string(2,'-');
+        // std::cout<<out<<fileName<<std::endl;
+        // for(auto it:children){
+        //     it->display(depth+2);
+        // }
+
+
+        std::string indentation(depth, ' ');
+        std::cout << indentation << "|-- " << fileName << "/" << std::endl;
+        for (auto it : children) {
+            it->display(depth + 3); // Adjust the depth for sub-items
         }
     }
 };
-FileNode* root=new Folder("T1");
-void getDirList(const std::string& directoryPath,FileNode*& curFolder){
-    // std::cout<<directoryPath<<std::endl;
+
+class FileTree{
+private:
+
+    void getDirList(const std::string& directoryPath,FileNode*& curFolder);
+public:
+    void tree(std::string folderPath="."){
+        FileNode* root=new Folder(folderPath);
+    
+        getDirList(folderPath,root);
+        root->display(0);
+    }
+};
+
+
+
+void FileTree::getDirList(const std::string& directoryPath,FileNode*& curFolder){
     DIR* dir = opendir(directoryPath.c_str());
     if (dir) {
         struct dirent* entry;
@@ -70,9 +99,13 @@ void getDirList(const std::string& directoryPath,FileNode*& curFolder){
     }
 }
 
-int main(){
-    std::string folder_name="..\\T1";
+int main(int argc,char**argv){
+    FileTree* fileTree=new FileTree();
+    if(argc<2){
+        fileTree->tree("..");
+    }else{
+        fileTree->tree(std::string(argv[1]));
+    }
     
-    getDirList(folder_name,root);
-    root->display(1);
+    
 }
